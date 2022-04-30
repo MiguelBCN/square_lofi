@@ -16,6 +16,7 @@ class Squares {
   constructor(divPadre, size) {
     this.size = size;
     this.divPadre = divPadre;
+    this.speed = 1000;
     this.dificulty = dim_grids[size - 1][0] * dim_grids[size - 1][1];
     this.atribsOfSquares = ["col-3", "square"];
     this.squares = [];
@@ -25,13 +26,11 @@ class Squares {
     for (let i = 0; i < this.dificulty; i++) {
       let square = document.createElement("div");
       this.addAtribs(square, this.atribsOfSquares);
-      console.log(listIds);
       square.setAttribute("id", listIds[i]);
       square.textContent = "Columns";
       this.squares.push(square);
     }
-    console.log(this.divPadre);
-    console.log(this.squares);
+
     for (let i = 0; i < this.squares.length; i++) {
       this.divPadre.appendChild(this.squares[i]);
     }
@@ -40,6 +39,25 @@ class Squares {
     addAtribs.forEach((atrib) => {
       square.classList.add(atrib);
     });
+  }
+  changeColor(seq) {
+    let changedSquares = [];
+    for (let i = 0; i < seq.length; i++) {
+      let idSquare = "" + seq[i][0] + "," + seq[i][1];
+      changedSquares.push(document.getElementById(idSquare));
+    }
+
+    let sequenceIndex = 0;
+    let timer = setInterval(() => {
+      const square = changedSquares[sequenceIndex];
+      console.log(square);
+      square.classList.add("square-on");
+      setTimeout(() => square.classList.remove("square-on"), this.speed / 2);
+      sequenceIndex++;
+      if (sequenceIndex > seq.length - 1) {
+        clearInterval(timer);
+      }
+    }, this.speed);
   }
 
   generateListId(grid) {
@@ -64,26 +82,50 @@ class Squares {
   }
 }
 
-// Id de de div donde se monta, tipo de grid, tamaño de secuencia
-const game = new Squares(board, 3);
-game.crearGrid();
-
 class SquareGame {
   constructor(size, dificulty) {
     this.size = size;
     this.buttonPlay;
-    this.selectLvl;
-    this.gmaeLose = false;
-    this.square = new Squares(board,size)
-    this.seqRandom = generate_random_seq(dificulty,dim_grids[size-1])
-    this.seqPlayer=[]
+    this.selectorLvl;
+ 
+    this.selectorLvlValue;
+    this.container;
+    this.gameLose = false;
+    this.square;
+    this.seqRandom = generate_random_seq(dificulty, dim_grids[size - 1]);
+    this.seqPlayer = [];
   }
-  init_buttons(){
-      this.buttonPlay = document.getElementById("play")
-      this.selectLvl = document.getElementsByTagName("select")[0]
+  init_buttons() {
+    this.buttonPlay = document.getElementById("play");
+    this.selectorLvl = document.getElementById("selector");
+    this.container = document.getElementById("game");
+    this.selectorLvlValue = this.selectorLvl.value;
+  }
+  init_game() {
+    console.log("play", this.selectorLvl.value);
+    // ajustamos el container
+    this.adjustContainer(this.selectorLvl.value)
+
+    this.square = new Squares(board, this.selectorLvl.value);
+    console.log(this.selectorLvl);
+    this.square.crearGrid();
+    console.log(this.seqRandom);
+    this.square.changeColor(this.seqRandom);
+    this.buttonPlay.classList.add("disabled");
+  }
+  adjustContainer(value){
+    this.container.classList.remove("container2")
+    
+    let s ="container"+ value
+    console.log("Container", s)
+    this.container.classList.add(s)
   }
 }
-
+const squareGame = new SquareGame(3, 10);
+squareGame.init_buttons();
+squareGame.buttonPlay.addEventListener("click", function () {
+  squareGame.init_game();
+});
 /*
 seq.forEach((element) => {
   let idSquare = "" + element[0] + "," + element[1];
