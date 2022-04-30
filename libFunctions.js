@@ -21,3 +21,5 @@ export function generate_random_seq(dificulty, grid) {
   }
   return sequence;
 }
+
+
