@@ -3,13 +3,20 @@ const size_grid = [1, 2, 3, 4, 5];
 const dificulty = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const dim_grids = [
   [2, 2],
-  [2, 3],
   [3, 3],
-  [3, 4],
-  [3, 5],
+  [4, 4],
+  [4, 5],
 ];
 let gameSquares = document.getElementById("game");
 let board = document.getElementById("board");
+let dificultyText = document.getElementById("dificulty");
+let winTitle = document.createElement("div");
+let gameLose = false;
+winTitle.classList.add("bgn-primary");
+winTitle.classList.add("text-center");
+winTitle.textContent = "Winnner 😼!!";
+
+let seq_player = [];
 
 // Esta clase se eencarga de crear el grid y de cambiar su color
 class Squares {
@@ -17,7 +24,7 @@ class Squares {
     this.size = size;
     this.divPadre = divPadre;
     this.speed = 1000;
-    this.dificulty = dim_grids[size - 1][0] * dim_grids[size - 1][1];
+    this.dificulty = dim_grids[size-2 ][0] * dim_grids[size-2][1];
     this.atribsOfSquares = ["col-3", "square"];
     this.squares = [];
   }
@@ -27,7 +34,8 @@ class Squares {
       let square = document.createElement("div");
       this.addAtribs(square, this.atribsOfSquares);
       square.setAttribute("id", listIds[i]);
-      square.textContent = "Columns";
+
+      square.textContent = "";
       this.squares.push(square);
     }
 
@@ -40,6 +48,7 @@ class Squares {
       square.classList.add(atrib);
     });
   }
+
   changeColor(seq) {
     let changedSquares = [];
     for (let i = 0; i < seq.length; i++) {
@@ -54,7 +63,7 @@ class Squares {
       square.classList.add("square-on");
       setTimeout(() => square.classList.remove("square-on"), this.speed / 2);
       sequenceIndex++;
-      if (sequenceIndex > seq.length - 1) {
+      if (sequenceIndex > seq.length - 1 && gameLose == false) {
         clearInterval(timer);
       }
     }, this.speed);
@@ -64,13 +73,14 @@ class Squares {
     let height = grid[0];
     let width = grid[1];
     let arr = [];
-    for (let i = 0; i < height; i++) {
+    for (let i = 0; i < width; i++) {
       arr[i] = [];
-      for (let j = 0; j < width; j++) {
+      for (let j = 0; j < height; j++) {
         arr[i][j] = "" + i + "," + j;
       }
     }
-
+    console.log("ARR",arr)
+    console.log("FLAT",arr.flat(1))
     return arr.flat(1);
   }
 
@@ -87,7 +97,6 @@ class SquareGame {
     this.size = size;
     this.buttonPlay;
     this.selectorLvl;
- 
     this.selectorLvlValue;
     this.container;
     this.gameLose = false;
@@ -102,9 +111,9 @@ class SquareGame {
     this.selectorLvlValue = this.selectorLvl.value;
   }
   init_game() {
-    console.log("play", this.selectorLvl.value);
+    console.log("play", this.seqRandom);
     // ajustamos el container
-    this.adjustContainer(this.selectorLvl.value)
+    this.adjustContainer(this.selectorLvl.value);
 
     this.square = new Squares(board, this.selectorLvl.value);
     console.log(this.selectorLvl);
@@ -113,28 +122,50 @@ class SquareGame {
     this.square.changeColor(this.seqRandom);
     this.buttonPlay.classList.add("disabled");
   }
-  adjustContainer(value){
-    this.container.classList.remove("container2")
-    
-    let s ="container"+ value
-    console.log("Container", s)
-    this.container.classList.add(s)
+  adjustContainer(value) {
+    this.container.classList.remove("container2");
+
+    let s = "container" + value;
+    console.log("Container", s);
+    this.container.classList.add(s);
   }
 }
-const squareGame = new SquareGame(3, 10);
+
+let dif = Math.floor(Math.random() * (4 - 1) + 1);
+let selector = document.getElementById("selector")
+
+const squareGame = new SquareGame(selector.value, dif);
+console.log("RANDOM SEQ", squareGame.seqRandom);
 squareGame.init_buttons();
 squareGame.buttonPlay.addEventListener("click", function () {
   squareGame.init_game();
-});
-/*
-seq.forEach((element) => {
-  let idSquare = "" + element[0] + "," + element[1];
-  let square = document.getElementById(idSquare);
-  let intervalTime = 500;
-  console.log(square);
-  let on = setInterval(function () {
-    square.style.backgroundColor = "black";
-  }, 10000 - intervalTime);
+  dificultyText.textContent = "Dificulty " + dif;
+  let opcionPlayer = board.getElementsByTagName("div");
+  console.log("nodes", opcionPlayer);
+  for (let i = 0; i < opcionPlayer.length; i++) {
+    opcionPlayer[i].addEventListener("click", function () {
+      console.log("FFFF");
+      opcionPlayer[i].classList.add("square-on");
 
-  console.log(intervalTime);
-});*/
+      let idSquare = opcionPlayer[i].getAttribute("id");
+      seq_player.push(idSquare);
+      let win = checkSequence(seq_player, squareGame.seqRandom);
+
+      dificultyText.textContent = seq_player.join(",");
+      if (win) {
+        dificultyText.appendChild(winTitle);
+        gameLose = true;
+      }
+    });
+  }
+});
+
+function checkSequence(player, random) {
+  console.log(player);
+  console.log(random);
+  let iguales = true;
+  for (let i = 0; i < random.length; i++) {
+    if (player[i] != random[i]) iguales = false;
+  }
+  return iguales;
+}
