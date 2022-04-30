@@ -8,39 +8,40 @@ const dim_grids = [
   [3, 4],
   [3, 5],
 ];
+let gameSquares = document.getElementById("game");
+let board = document.getElementById("board");
 
 // Esta clase se eencarga de crear el grid y de cambiar su color
 class Squares {
-  constructor(divPadre, size, dificulty) {
+  constructor(divPadre, size) {
     this.size = size;
     this.divPadre = divPadre;
-    this.dificulty = dificulty;
+    this.dificulty = dim_grids[size - 1][0] * dim_grids[size - 1][1];
     this.atribsOfSquares = ["col-3", "square"];
     this.squares = [];
   }
   crearGrid() {
-    
     let listIds = this.generateListId(dim_grids[this.size - 1]);
     for (let i = 0; i < this.dificulty; i++) {
       let square = document.createElement("div");
       this.addAtribs(square, this.atribsOfSquares);
-      console.log(listIds)
+      console.log(listIds);
       square.setAttribute("id", listIds[i]);
-      square.textContent="Columns"
+      square.textContent = "Columns";
       this.squares.push(square);
-      
     }
-    console.log(this.divPadre)
-    console.log(this.squares)
+    console.log(this.divPadre);
+    console.log(this.squares);
     for (let i = 0; i < this.squares.length; i++) {
       this.divPadre.appendChild(this.squares[i]);
     }
   }
   addAtribs(square, addAtribs) {
-    this.atribsOfSquares.forEach((atrib) => {
+    addAtribs.forEach((atrib) => {
       square.classList.add(atrib);
     });
   }
+
   generateListId(grid) {
     let height = grid[0];
     let width = grid[1];
@@ -52,20 +53,37 @@ class Squares {
       }
     }
 
-    
+    return arr.flat(1);
+  }
 
-    return arr;
+  replaceAttrib(oldAtrib, newAtrib) {
+    for (let i = 0; i < this.squares.length; i++) {
+      this.squares[i].classList.remove(oldAtrib);
+      this.squares[i].classList.add(newAtrib);
+    }
   }
 }
-let divPadre = document.getElementById("board");
 
-const game = new Squares(divPadre, 2, 16);
+// Id de de div donde se monta, tipo de grid, tamaño de secuencia
+const game = new Squares(board, 3);
 game.crearGrid();
-for(let i=0;i< game.squares.length;i++){
-    game.squares[i].classList.remove("col-3")
-    game.squares[i].classList.add("col-4")
-    
+
+class SquareGame {
+  constructor(size, dificulty) {
+    this.size = size;
+    this.buttonPlay;
+    this.selectLvl;
+    this.gmaeLose = false;
+    this.square = new Squares(board,size)
+    this.seqRandom = generate_random_seq(dificulty,dim_grids[size-1])
+    this.seqPlayer=[]
+  }
+  init_buttons(){
+      this.buttonPlay = document.getElementById("play")
+      this.selectLvl = document.getElementsByTagName("select")[0]
+  }
 }
+
 /*
 seq.forEach((element) => {
   let idSquare = "" + element[0] + "," + element[1];
