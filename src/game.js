@@ -10,14 +10,19 @@ let gameSquares = document.getElementById("game");
 let board = document.getElementById("board");
 let dificultyText = document.getElementById("dificulty");
 let winTitle = document.createElement("div");
+let errorTitle = document.createElement("div");
 let gameLose = false;
 let soundClick = new Audio("resources/drip.mp3");
+let soundError = new Audio("resources/error.mp3");
 let seq_player = []
 let dif;
 
 winTitle.classList.add("winner-button");
 winTitle.classList.add("text-center");
 winTitle.textContent = "Winnner 😼!!";
+errorTitle.classList.add("error-button");
+errorTitle.classList.add("text-center");
+errorTitle.textContent = "Error!!";
 
 // Esta clase se eencarga de crear el grid y de cambiar su color
 class Squares {
@@ -56,13 +61,13 @@ class Squares {
       let idSquare = "" + seq[i][0] + "," + seq[i][1];
       changedSquares.push(document.getElementById(idSquare));
     }
-
+ 
     let sequenceIndex = 0;
     let timer = setInterval(() => {
       const square = changedSquares[sequenceIndex];
       console.log(square);
       square.classList.add("square-on");
-      setTimeout(() => square.classList.remove("square-on"), this.speed / 2);
+      setTimeout(() => square.classList.remove("square-on"), this.speed / 3);
       sequenceIndex++;
       if (sequenceIndex > seq.length - 1 && gameLose == false) {
         clearInterval(timer);
@@ -143,15 +148,15 @@ class SquareGame {
     }
     
   }
+  enabledButton(){
+    this.buttonPlay.classList.replace("disabled","abled");
+  }
 }
 
 
 let selector = document.getElementById("selector");
 let val = selector.value
 dif = Math.floor(Math.random() * (5 - 2) + 2);
-
-
-
 
 
 const squareGame = new SquareGame(selector.value, dif);
@@ -164,27 +169,40 @@ squareGame.buttonPlay.addEventListener("click", function () {
   dificultyText.textContent = "Dificulty " + dif;
   let opcionPlayer = board.getElementsByTagName("div");
   console.log("nodes", opcionPlayer);
+  let j = 0;
   for (let i = 0; i < opcionPlayer.length; i++) {
     opcionPlayer[i].addEventListener("click", function () {
       console.log("FFFF");
       opcionPlayer[i].classList.add("square-on");
-
+      setTimeout(() => opcionPlayer[i].classList.remove("square-on"), 200);
       let idSquare = opcionPlayer[i].getAttribute("id");
       seq_player.push(idSquare);
       let win = checkSequence(seq_player, squareGame.seqRandom);
       soundClick.play();
 
-      
       if (win) {
         dificultyText.appendChild(winTitle);
         gameLose = true;
-        squareGame.buttonPlay.textContent="Refresh page"
+        squareGame.buttonPlay.textContent="Refresh page";
+        squareGame.enabledButton();
+        squareGame.buttonPlay.addEventListener("click", function(){
+          location.reload();
+        })
       }
+      else if (j == (dif-1)){
+        dificultyText.appendChild(errorTitle);
+        gameLose = true;
+        squareGame.buttonPlay.textContent="Refresh page";
+        squareGame.enabledButton();
+        squareGame.buttonPlay.addEventListener("click", function(){
+          location.reload();
+        });
+        soundError.play();
+      }
+      j++;
     });
   }
 });
-
-
 
 
 // FUNCTIONS

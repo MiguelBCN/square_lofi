@@ -1,4 +1,4 @@
-.square {
+.square{
     margin: 1px;
     border-radius: 10px;
     border-width:5px;
@@ -13,6 +13,13 @@
 
 .winner-button{
     background-color: rgb(255,238,142);
+    font-size: 20px;
+    font-family: 'Helvetica Neue', monospace;
+}
+
+.error-button{
+    background-color: rgb(205, 24, 24);
+    color: white;
     font-size: 20px;
     font-family: 'Helvetica Neue', monospace;
 }
