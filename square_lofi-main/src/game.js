@@ -13,6 +13,7 @@ let winTitle = document.createElement("div");
 let errorTitle = document.createElement("div");
 let gameLose = false;
 let soundClick = new Audio("resources/drip.mp3");
+let soundError = new Audio("resources/error.mp3");
 let seq_player = []
 let dif;
 
@@ -195,7 +196,8 @@ squareGame.buttonPlay.addEventListener("click", function () {
         squareGame.enabledButton();
         squareGame.buttonPlay.addEventListener("click", function(){
           location.reload();
-        })
+        });
+        soundError.play();
       }
       j++;
     });
