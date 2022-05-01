@@ -1,5 +1,4 @@
-import { greet, message, generate_random_seq } from "./libFunctions.js";
-const size_grid = [1, 2, 3, 4, 5];
+const size_grid = [1, 2, 3, 4];
 const dificulty = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const dim_grids = [
   [2, 2],
@@ -12,11 +11,13 @@ let board = document.getElementById("board");
 let dificultyText = document.getElementById("dificulty");
 let winTitle = document.createElement("div");
 let gameLose = false;
-winTitle.classList.add("bgn-primary");
+let soundClick = new Audio("resources/drip.mp3");
+let seq_player = []
+let dif;
+
+winTitle.classList.add("winner-button");
 winTitle.classList.add("text-center");
 winTitle.textContent = "Winnner 😼!!";
-
-let seq_player = [];
 
 // Esta clase se eencarga de crear el grid y de cambiar su color
 class Squares {
@@ -24,7 +25,7 @@ class Squares {
     this.size = size;
     this.divPadre = divPadre;
     this.speed = 1000;
-    this.dificulty = dim_grids[size-2 ][0] * dim_grids[size-2][1];
+    this.dificulty = dim_grids[size - 1][0] * dim_grids[size - 1][1];
     this.atribsOfSquares = ["col-3", "square"];
     this.squares = [];
   }
@@ -79,8 +80,8 @@ class Squares {
         arr[i][j] = "" + i + "," + j;
       }
     }
-    console.log("ARR",arr)
-    console.log("FLAT",arr.flat(1))
+    console.log("ARR", arr);
+    console.log("FLAT", arr.flat(1));
     return arr.flat(1);
   }
 
@@ -124,20 +125,41 @@ class SquareGame {
   }
   adjustContainer(value) {
     this.container.classList.remove("container2");
+    console.log("VALUE", value)
 
-    let s = "container" + value;
-    console.log("Container", s);
-    this.container.classList.add(s);
+    switch (value) {
+      case '1':
+        this.container.classList.add("container2");
+        break;
+      case '2':
+        this.container.classList.add("container3");
+        break;
+      case '3':
+        this.container.classList.add("container4");
+        break;
+      case '4':
+        this.container.classList.add("container4");
+        break;
+    }
+    
   }
 }
 
-let dif = Math.floor(Math.random() * (4 - 1) + 1);
-let selector = document.getElementById("selector")
+
+let selector = document.getElementById("selector");
+let val = selector.value
+dif = Math.floor(Math.random() * (5 - 2) + 2);
+
+
+
+
 
 const squareGame = new SquareGame(selector.value, dif);
 console.log("RANDOM SEQ", squareGame.seqRandom);
 squareGame.init_buttons();
+
 squareGame.buttonPlay.addEventListener("click", function () {
+  console.log("hola");
   squareGame.init_game();
   dificultyText.textContent = "Dificulty " + dif;
   let opcionPlayer = board.getElementsByTagName("div");
@@ -150,16 +172,39 @@ squareGame.buttonPlay.addEventListener("click", function () {
       let idSquare = opcionPlayer[i].getAttribute("id");
       seq_player.push(idSquare);
       let win = checkSequence(seq_player, squareGame.seqRandom);
+      soundClick.play();
 
-      dificultyText.textContent = seq_player.join(",");
+      
       if (win) {
         dificultyText.appendChild(winTitle);
         gameLose = true;
+        squareGame.buttonPlay.classList.remove("disabled");
       }
     });
   }
 });
 
+
+
+
+// FUNCTIONS
+function generateRandomInteger(max) {
+  return Math.floor(Math.random() * max) + 1;
+}
+
+function generate_random_seq(dificulty, grid) {
+  let sequence = [];
+  let height = grid[0];
+  let width = grid[1];
+  console.log("GRID", grid, "DIFIVULTY", dificulty);
+  for (let i = 0; i < dificulty; i++) {
+    let x = generateRandomInteger(height) - 1;
+    let y = generateRandomInteger(width) - 1;
+
+    sequence.push([x, y]);
+  }
+  return sequence;
+}
 function checkSequence(player, random) {
   console.log(player);
   console.log(random);
@@ -169,3 +214,4 @@ function checkSequence(player, random) {
   }
   return iguales;
 }
+
