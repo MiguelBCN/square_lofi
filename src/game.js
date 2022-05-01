@@ -178,7 +178,7 @@ squareGame.buttonPlay.addEventListener("click", function () {
       if (win) {
         dificultyText.appendChild(winTitle);
         gameLose = true;
-        squareGame.buttonPlay.classList.remove("disabled");
+        squareGame.buttonPlay.textContent="Refresh page"
       }
     });
   }
